@@ -1,23 +1,45 @@
 package com.wind.auth.model;
 
-import com.wind.auth.model.Permission;
+import com.wind.model.BaseObject;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 /**
- * Role
+ * Role 角色表
  *
  * @author qianchun 17/7/24
  **/
-public class Role implements Serializable{
+public class Role extends BaseObject {
+    /**
+     * 主键ID
+     */
     private long id;
+
+    /**
+     * 角色名称
+     */
     private String name;
+
+    /**
+     * 状态 1:启用 0:停用
+     */
     private int status;
+
+    /**
+     * 创建时间
+     */
     private Date createTime;
+
+    /**
+     * 更新时间
+     */
     private Date updateTime;
-    private List<Permission> permissions;
+
+    /**
+     * 权限列表
+     */
+    private List<Permission> permissionList;
 
 
     public long getId() {
@@ -60,11 +82,11 @@ public class Role implements Serializable{
         this.updateTime = updateTime;
     }
 
-    public List<Permission> getPermissions() {
-        return permissions;
+    public List<Permission> getPermissionList() {
+        return permissionList;
     }
 
-    public void setPermissions(List<Permission> permissions) {
-        this.permissions = permissions;
+    public void setPermissionList(List<Permission> permissionList) {
+        this.permissionList = permissionList;
     }
 }

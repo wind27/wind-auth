@@ -20,6 +20,14 @@
         </snapshotRepository>
     </distributionManagement>
 
+
+    <dependencies>
+        <dependency>
+            <groupId>com.wind</groupId>
+            <artifactId>wind-framework</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
     <build>
         <defaultGoal>compile</defaultGoal>
     </build>

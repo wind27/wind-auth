@@ -1,18 +1,39 @@
 package com.wind.auth.model;
 
-import java.io.Serializable;
+import com.wind.model.BaseObject;
+
 import java.util.Date;
 
 /**
- * UserRole
+ * LinkUserRole 用户角色关联关系
  *
  * @author qianchun 17/7/24
  **/
-public class UserRole implements Serializable{
+public class LinkUserRole extends BaseObject {
+
+    /**
+     * 主键ID
+     */
     private long id;
+
+    /**
+     * 用户ID
+     */
     private long userId;
+
+    /**
+     * 角色ID
+     */
     private long roleId;
+
+    /**
+     * 创建时间
+     */
     private Date createTime;
+
+    /**
+     * 更新时间
+     */
     private Date updateTime;
 
     public long getId() {

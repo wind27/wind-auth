@@ -5,30 +5,31 @@ import com.wind.model.BaseObject;
 import java.util.Date;
 
 /**
- * Permission 权限表
+ * App 应用app
  *
- * @author qianchun 17/7/24
+ * @author qianchun 17/11/6
  **/
-public class Permission extends BaseObject {
+public class App extends BaseObject {
+
     /**
      * 主键ID
      */
     private long id;
 
     /**
-     * 权限名称
+     * 应用名称
      */
     private String name;
 
     /**
-     * 权限值
-     */
-    private String value;
-
-    /**
-     * 状态 1:启用 0:停用
+     * 应用状态 1:启用 0:停用
      */
     private int status;
+
+    /**
+     * 首页地址
+     */
+    private String homePageUrl;
 
     /**
      * 创建时间
@@ -39,11 +40,6 @@ public class Permission extends BaseObject {
      * 更新时间
      */
     private Date updateTime;
-
-    /**
-     * 排序
-     */
-    private int seq;
 
     public long getId() {
         return id;
@@ -61,20 +57,20 @@ public class Permission extends BaseObject {
         this.name = name;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public int getStatus() {
         return status;
     }
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getHomePageUrl() {
+        return homePageUrl;
+    }
+
+    public void setHomePageUrl(String homePageUrl) {
+        this.homePageUrl = homePageUrl;
     }
 
     public Date getCreateTime() {
@@ -91,13 +87,5 @@ public class Permission extends BaseObject {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
-    }
-
-    public int getSeq() {
-        return seq;
-    }
-
-    public void setSeq(int seq) {
-        this.seq = seq;
     }
 }
