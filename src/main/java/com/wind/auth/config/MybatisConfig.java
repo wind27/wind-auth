@@ -1,8 +1,8 @@
 package com.wind.auth.config;
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
-import com.wind.auth.database.DatabaseCatalog;
-import com.wind.auth.database.DynamicDataSource;
+import com.wind.dbpool.database.DynamicDataSource;
+import com.wind.dbpool.emun.DatabaseCatalog;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -27,9 +27,10 @@ import java.util.Properties;
  * @author qianchun
  * @date 2019/1/29
  **/
+@SuppressWarnings({"all"})
 @Configuration // 配置
 //@PropertySource("classpath:db.properties") // 用来指定配置文件的位置
-@MapperScan(basePackages = { "com.wind.auth.dao" })
+@MapperScan(basePackages = { "com.wind.admin.dao" })
 public class MybatisConfig {
     private final static Logger logger = LoggerFactory.getLogger(MybatisConfig.class);
 
@@ -114,7 +115,7 @@ public class MybatisConfig {
 
     /**
      * 根据数据源创建SqlSessionFactory
-     * 
+     *
      * @param dataSource 数据源
      * @return 返回结果
      */
