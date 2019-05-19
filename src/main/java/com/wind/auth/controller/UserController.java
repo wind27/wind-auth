@@ -1,21 +1,23 @@
 package com.wind.auth.controller;
 
+import com.wind.auth.model.Permission;
+import com.wind.auth.model.RoleVO;
 import com.wind.auth.model.User;
+import com.wind.auth.model.UserVO;
 import com.wind.auth.service.UserService;
 import com.wind.common.ErrorCode;
 import com.wind.common.Page;
 import com.wind.utils.JsonResponseUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/user")
@@ -32,18 +34,20 @@ public class UserController {
      */
     @ResponseBody
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public Object list(@RequestParam("pageNum") int pageNum, @RequestParam("pageSize") int pageSize) {
+    public Object list(@RequestParam("pageNo") int pageNo, @RequestParam("pageSize") int pageSize) {
         try {
-            if (pageNum < 1) {
-                pageNum = 1;
-            }
-
-            Page pageModel = new Page(pageNum, pageSize);
+            Map<String, Object> data = new HashMap<>();
+            Page pageModel = new Page(pageNo, pageSize);
             Map<String, Object> params = new HashMap<>();
             params.put("page", pageModel);
 
-            List<User> userList = userService.findPage(params);
-            return JsonResponseUtil.ok(userList);
+            List<User> list = userService.findPage(params);
+            int total = userService.count(params);
+
+            pageModel.setTotal(total);
+            data.put("list", list);
+            data.put("page", pageModel);
+            return JsonResponseUtil.ok(data);
         } catch (Exception e) {
             logger.error("用户列表, 异常", e);
             return JsonResponseUtil.fail(ErrorCode.SYS_ERROR);
@@ -58,6 +62,7 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
     public Object detail(@PathVariable("id") Long id) {
+        Map<String, Object> data = new HashMap<>();
         if (id == null) {
             return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
         }
@@ -65,7 +70,8 @@ public class UserController {
         if (user == null) {
             return JsonResponseUtil.fail(ErrorCode.USER_NOT_EXISTS);
         }
-        return JsonResponseUtil.ok(user);
+        data.put("user", user);
+        return JsonResponseUtil.ok(data);
     }
 
     /**
@@ -90,7 +96,7 @@ public class UserController {
         user.setUpdateTime(new Date());
         boolean flag = userService.saveOrUpdate(user);
         if (flag) {
-            return JsonResponseUtil.ok(user);
+            return JsonResponseUtil.ok();
         } else {
             return JsonResponseUtil.fail(ErrorCode.FAIL);
         }
@@ -104,11 +110,11 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     public Object delete(@PathVariable("id") Long id) {
-        if(id == null) {
+        if (id == null) {
             return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
         }
         boolean flag = userService.delete(id);
-        if(flag) {
+        if (flag) {
             return JsonResponseUtil.ok();
         } else {
             return JsonResponseUtil.fail();
@@ -133,7 +139,7 @@ public class UserController {
         user.setStatus(1);
         user.setUpdateTime(new Date());
         userService.saveOrUpdate(user);
-        return JsonResponseUtil.ok(user);
+        return JsonResponseUtil.ok();
     }
 
     /**
@@ -154,8 +160,87 @@ public class UserController {
         user.setStatus(0);
         user.setUpdateTime(new Date());
         userService.saveOrUpdate(user);
-        return JsonResponseUtil.ok(user);
+        return JsonResponseUtil.ok();
     }
+
+    /**
+     * 更新用户绑定角色
+     *
+     * @param id 用户id
+     * @param roleIds 用户角色ids
+     * @return 返回结果
+     */
+    @ResponseBody
+    @RequestMapping(value = "/role/update/", method = RequestMethod.GET)
+    public Object permissionList(@RequestParam("id") Long id, @RequestParam("roleIds") String roleIds) {
+        if (roleIds == null || StringUtils.isEmpty(roleIds)) {
+            return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
+        }
+        List<Long> roleIdList = new ArrayList<>();
+        Arrays.asList(roleIds.split(",")).forEach(idStr -> {
+            idStr = idStr.trim();
+            if (StringUtil.isNumeric(idStr) && !roleIdList.contains(Long.parseLong(idStr))) {
+                roleIdList.add(Long.parseLong(idStr));
+            }
+        });
+        if (CollectionUtils.isEmpty(roleIdList)) {
+            logger.error("用户绑定角色更新, roleIds 为空");
+            return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
+        }
+        ErrorCode errorCode = userService.updateRolesById(id, roleIdList);
+        if (ErrorCode.SUCCESS.equals(errorCode)) {
+            return JsonResponseUtil.ok();
+        } else {
+            return JsonResponseUtil.fail(errorCode);
+        }
+    }
+
+    /**
+     * 获取用户权限列表
+     * 
+     * @param id 用户id
+     * @return 返回结果
+     */
+    @ResponseBody
+    @RequestMapping(value = "/permission/{id}", method = RequestMethod.GET)
+    public Object permissionList(@PathVariable("id") Long id) {
+        Map<String, Object> data = new HashMap<>();
+        if (id == null) {
+            return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
+        }
+        List<Permission> list = userService.findPermissionByUserId(id);
+        data.put("list", list);
+        return JsonResponseUtil.ok(data);
+    }
+
+    // /**
+    // * 用户统计
+    // *
+    // * @return 返回结果
+    // */
+    // @ResponseBody
+    // @RequestMapping(value = "/count", method = RequestMethod.GET)
+    // public Object count(User user) {
+    // Map<String, Object> param = new HashMap<>();
+    // int count = userService.count(param);
+    // return JsonResponseUtil.ok(count);
+    // }
+    //
+    //
+    // @ResponseBody
+    // @RequestMapping(value = "/tes/{id}", method = RequestMethod.GET)
+    // public Object detailVO(@PathVariable("id") Long id) {
+    // try {
+    // if(id == null) {
+    // return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
+    // }
+    // List<UserVO> list = userService.findVOById(id);
+    // return JsonResponseUtil.ok(list);
+    // } catch (Exception e) {
+    // logger.error("用户列表, 异常", e);
+    // return JsonResponseUtil.fail(ErrorCode.SYS_ERROR);
+    // }
+    // }
 
     /**
      * 用户统计
@@ -164,12 +249,8 @@ public class UserController {
      */
     @ResponseBody
     @RequestMapping(value = "/count", method = RequestMethod.GET)
-    public Object count(User user) {
-
-        Map<String, Object> param = new HashMap<>();
-
-        int count = userService.count(param);
+    public Object count() {
+        int count = 1/0;
         return JsonResponseUtil.ok(count);
     }
-
 }

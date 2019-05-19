@@ -1,11 +1,20 @@
 package com.wind.auth.service;
 
+import com.wind.auth.dao.LinkUserRoleExDao;
+import com.wind.auth.dao.PermissionExDao;
+import com.wind.auth.dao.RoleExDao;
 import com.wind.auth.dao.UserExDao;
-import com.wind.auth.model.User;
+import com.wind.auth.model.*;
+import com.wind.common.ErrorCode;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +25,19 @@ import java.util.Map;
  **/
 @Service
 public class UserService {
+    private final static Logger logger = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    private UserExDao userDao;
+    private UserExDao userExDao;
+
+    @Autowired
+    private PermissionExDao permissionExDao;
+
+    @Autowired
+    private RoleExDao roleExDao;
+
+    @Autowired
+    private LinkUserRoleExDao linkUserRoleExDao;
 
     /**
      * 主键id查询
@@ -30,7 +49,7 @@ public class UserService {
         if (id == 0) {
             return null;
         }
-        return userDao.getByPrimary(id);
+        return userExDao.getByPrimary(id);
     }
 
     /**
@@ -43,8 +62,16 @@ public class UserService {
         if (StringUtils.isEmpty(mobile)) {
             return null;
         }
-        return userDao.findByMobile(mobile);
+        return userExDao.findByMobile(mobile);
     }
+
+    public User findByUsername(String username) {
+        if (StringUtils.isEmpty(username)) {
+            return null;
+        }
+        return userExDao.findByMobile(username);
+    }
+
 
     /**
      * 新增或修改
@@ -57,9 +84,9 @@ public class UserService {
             return false;
         }
         if (user.getId() != null) {
-            return userDao.update(user) > 0;
+            return userExDao.update(user) > 0;
         } else {
-            return userDao.save(user) > 0;
+            return userExDao.save(user) > 0;
         }
     }
 
@@ -73,10 +100,10 @@ public class UserService {
         if (id == null) {
             return true;
         }
-        if (userDao.getByPrimary(id) == null) {
+        if (userExDao.getByPrimary(id) == null) {
             return true;
         }
-        return userDao.delete(id) > 0;
+        return userExDao.delete(id) > 0;
     }
 
     /**
@@ -86,7 +113,7 @@ public class UserService {
      * @return 返回结果
      */
     public int count(Map<String, Object> params) {
-        return userDao.count(params);
+        return userExDao.count(params);
     }
 
     /**
@@ -96,6 +123,89 @@ public class UserService {
      * @return 返回结果
      */
     public List<User> findPage(Map<String, Object> params) {
-        return userDao.findPage(params);
+        return userExDao.findPage(params);
+    }
+
+
+    /**
+     * 根据 userId 获取权限列表
+     * @param userId 用户id
+     * @return 返回结果
+     */
+    public List<Permission> findPermissionByUserId(Long userId) {
+        if(userId == null) {
+            return null;
+        }
+        List<Long> roleIdList = roleExDao.findRoleIdsByUserId(userId);
+        if(CollectionUtils.isNotEmpty(roleIdList)) {
+            return permissionExDao.getByRoleIds(roleIdList);
+        }
+        return  null;
+    }
+    /**
+     * 根据用户id获取用户信息,角色信息,权限信息
+     * @param id 用户id
+     * @return 返回结果
+     */
+    public List<UserVO> findVOById(Long id) {
+        if(id == null) {
+            return null;
+        }
+        return userExDao.findVOById(id);
+    }
+
+
+
+    /**
+     * 更新用户绑定角色
+     * @param userId 用户id
+     * @param roleIds 权限列表
+     * @return 返回结果
+     */
+//    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public ErrorCode updateRolesById(Long userId, List<Long> roleIds) {
+        if(userId == null) {
+            return ErrorCode.PARAM_ERROR;
+        }
+
+        User user = this.findById(userId);
+        if (user == null) {
+            logger.error("用户绑定角色更新, 用户不存在");
+            return ErrorCode.USER_NOT_EXISTS;
+        }
+
+        List<Long> deleteRoleIds = new ArrayList<>();
+        List<Long> currentRoleIdList = roleExDao.findRoleIdsByUserId(userId);
+        //删除角色
+        if(CollectionUtils.isNotEmpty(currentRoleIdList)) {
+            currentRoleIdList.forEach(id -> {
+                if(!roleIds.contains(id)) {
+                    deleteRoleIds.add(id);
+                }
+            });
+
+            if(CollectionUtils.isNotEmpty(deleteRoleIds)) {
+                linkUserRoleExDao.deleteByRoleIds(deleteRoleIds);
+            }
+        }
+        List<LinkUserRole> addLinkUserRoleList = new ArrayList<>();
+        //新增角色
+        if(CollectionUtils.isNotEmpty(roleIds)) {
+            roleIds.forEach(roleId -> {
+                if(!currentRoleIdList.contains(roleId)) {
+                    Date now = new Date();
+                    LinkUserRole userRole = new LinkUserRole();
+                    userRole.setRoleId(roleId);
+                    userRole.setUserId(userId);
+                    userRole.setCreateTime(now);
+                    userRole.setUpdateTime(now);
+                    addLinkUserRoleList.add(userRole);
+                }
+            });
+            if(CollectionUtils.isNotEmpty(addLinkUserRoleList)) {
+                linkUserRoleExDao.batchSave(addLinkUserRoleList);
+            }
+        }
+        return ErrorCode.SUCCESS;
     }
 }
