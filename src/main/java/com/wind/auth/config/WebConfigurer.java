@@ -1,6 +1,7 @@
 package com.wind.auth.config;
 
 import com.wind.auth.interceptor.AccessLimitInterceptor;
+import com.wind.auth.interceptor.AuthInterceptor;
 import com.wind.passport.spring.argument.resolver.PwdHandlerMethodArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,8 +26,11 @@ import java.util.List;
 @Configuration
 public class WebConfigurer {
 
-     @Autowired
-     private AccessLimitInterceptor accessLimitInterceptor;
+    @Autowired
+    private AccessLimitInterceptor accessLimitInterceptor;
+
+    @Autowired
+    private AuthInterceptor authInterceptor;
 
     @Autowired
     private PwdHandlerMethodArgumentResolver pwdHandlerMethodArgumentResolver;
@@ -34,11 +38,11 @@ public class WebConfigurer {
     @Autowired
     private SessionInfoArgumentResolver sessionInfoArgumentResolver;
 
-//     @Autowired
-//     private LoginInterceptor loginInterceptor;
+    // @Autowired
+    // private LoginInterceptor loginInterceptor;
 
-//    @Autowired
-//    private FastJsonHttpMessageConverter fastJsonHttpMessageConverter;
+    // @Autowired
+    // private FastJsonHttpMessageConverter fastJsonHttpMessageConverter;
 
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {
@@ -51,7 +55,9 @@ public class WebConfigurer {
              */
             @Override
             public void addInterceptors(InterceptorRegistry registry) {
-                 registry.addInterceptor(accessLimitInterceptor).addPathPatterns("/**");
+//                registry.addInterceptor(accessLimitInterceptor).addPathPatterns("/**");
+//                registry.addInterceptor(authInterceptor).addPathPatterns("/**");
+
                 // registry.addInterceptor(loginInterceptor).addPathPatterns("/**").excludePathPatterns("/kaptcha/");
             }
 
@@ -63,15 +69,14 @@ public class WebConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry corsRegistry) {
                 // corsRegistry.addMapping("/**");
-                corsRegistry.addMapping("/**").allowedOrigins("http://localhost:4200")
+                corsRegistry.addMapping("/**").allowedOrigins("http://admin.wind.com:4200")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD").allowCredentials(false).maxAge(3600);
 
-
-//                corsRegistry.addMapping("/**")//设置允许跨域的路径
-//                        .allowedOrigins("*")//设置允许跨域请求的域名
-//                        .allowCredentials(true)//是否允许证书 不再默认开启
-//                        .allowedMethods("GET", "POST", "PUT", "DELETE")//设置允许的方法
-//                        .maxAge(3600);//跨域允许时间
+                // corsRegistry.addMapping("/**")//设置允许跨域的路径
+                // .allowedOrigins("*")//设置允许跨域请求的域名
+                // .allowCredentials(true)//是否允许证书 不再默认开启
+                // .allowedMethods("GET", "POST", "PUT", "DELETE")//设置允许的方法
+                // .maxAge(3600);//跨域允许时间
             }
 
             @Override
@@ -160,12 +165,13 @@ public class WebConfigurer {
 
             /**
              * 返回结果转化 json
+             * 
              * @param httpMessageConverters httpMessageConverters
              */
             @Override
             public void configureMessageConverters(List<HttpMessageConverter<?>> httpMessageConverters) {
-//                super.configureMessageConverters(httpMessageConverters);
-//                httpMessageConverters.add(fastJsonHttpMessageConverter);
+                // super.configureMessageConverters(httpMessageConverters);
+                // httpMessageConverters.add(fastJsonHttpMessageConverter);
             }
 
             @Override

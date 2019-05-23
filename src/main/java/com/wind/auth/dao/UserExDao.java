@@ -42,6 +42,7 @@ public interface UserExDao extends UserDao {
      * @return 返回结果
      */
     @SelectProvider(type = UserProvider.class, method = "findPage")
+    @ResultMap(value = "userResult")
     List<User> findPage(Map<String, Object> params);
 
 

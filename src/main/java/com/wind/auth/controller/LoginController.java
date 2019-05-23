@@ -1,10 +1,11 @@
 package com.wind.auth.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.wind.auth.UserToken;
 import com.wind.auth.constants.Constant;
 import com.wind.auth.model.User;
+import com.wind.auth.model.UserToken;
 import com.wind.auth.service.UserService;
+import com.wind.auth.service.UserTokenService;
 import com.wind.auth.utils.SaltUtil;
 import com.wind.common.ErrorCode;
 import com.wind.passport.annotation.PwdDecrypt;
@@ -43,6 +44,9 @@ public class LoginController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserTokenService userTokenService;
 
     @ResponseBody
     @RequestMapping(value = "encrypt", method = RequestMethod.GET)
@@ -113,7 +117,7 @@ public class LoginController {
     @ResponseBody
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String appPwdLogin(HttpServletRequest request, HttpServletResponse response,
-            @RequestParam("username") String username, @RequestParam("password") @PwdDecrypt String password) {
+            @RequestParam("username") String username, @RequestParam("password") String password) {
         try {
             if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
                 return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
@@ -125,8 +129,12 @@ public class LoginController {
                 logger.error("登录,失败,username={}", username);
                 return JsonResponseUtil.fail(ErrorCode.SYS_ERROR);
             }
-            setLoginCookie(response, user, accessToken);
-            return JsonResponseUtil.ok();
+
+            UserToken userToken = userTokenService.save(request, user);
+            setLoginCookie(response, user, userToken.getToken());
+            Map<String, Object> data = new HashMap<>();
+            data.put("token", userToken.getToken());
+            return JsonResponseUtil.ok(data);
         } catch (Exception e) {
             logger.error("登录,异常,username={}", username, e);
             return JsonResponseUtil.fail(ErrorCode.SYS_ERROR);

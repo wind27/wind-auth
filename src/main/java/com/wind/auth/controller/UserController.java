@@ -7,6 +7,7 @@ import com.wind.auth.model.UserVO;
 import com.wind.auth.service.UserService;
 import com.wind.common.ErrorCode;
 import com.wind.common.Page;
+import com.wind.passport.annotation.AuthPermission;
 import com.wind.utils.JsonResponseUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,7 @@ public class UserController {
      * @return 返回结果
      */
     @ResponseBody
+    @AuthPermission("auth.user.list")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public Object list(@RequestParam("pageNo") int pageNo, @RequestParam("pageSize") int pageSize) {
         try {
@@ -60,6 +62,7 @@ public class UserController {
      * @return 返回结果
      */
     @ResponseBody
+//    @AuthPermission("auth.user.detail")
     @RequestMapping(value = "/detail/{id}", method = RequestMethod.GET)
     public Object detail(@PathVariable("id") Long id) {
         Map<String, Object> data = new HashMap<>();
@@ -80,6 +83,7 @@ public class UserController {
      * @return 返回结果
      */
     @ResponseBody
+//    @AuthPermission("auth.user.add")
     @RequestMapping(value = "/add", method = RequestMethod.GET)
     public Object add(User param) {
         if (StringUtils.isEmpty(param.getMobile())) {
@@ -108,6 +112,7 @@ public class UserController {
      * @return 返回结果
      */
     @ResponseBody
+//    @AuthPermission("auth.user.delete")
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     public Object delete(@PathVariable("id") Long id) {
         if (id == null) {
@@ -127,6 +132,7 @@ public class UserController {
      * @return 返回结果
      */
     @ResponseBody
+//    @AuthPermission("auth.user.enable")
     @RequestMapping(value = "/enable/{id}", method = RequestMethod.GET)
     public Object enable(@PathVariable("id") Long id) {
         if (id == null) {
@@ -148,6 +154,7 @@ public class UserController {
      * @return 返回结果
      */
     @ResponseBody
+//    @AuthPermission("auth.user.disable")
     @RequestMapping(value = "/disable/{id}", method = RequestMethod.GET)
     public Object disable(@PathVariable("id") Long id) {
         if (id == null) {
@@ -171,6 +178,7 @@ public class UserController {
      * @return 返回结果
      */
     @ResponseBody
+//    @AuthPermission("auth.user.role.update")
     @RequestMapping(value = "/role/update/", method = RequestMethod.GET)
     public Object permissionList(@RequestParam("id") Long id, @RequestParam("roleIds") String roleIds) {
         if (roleIds == null || StringUtils.isEmpty(roleIds)) {
@@ -202,6 +210,7 @@ public class UserController {
      * @return 返回结果
      */
     @ResponseBody
+//    @AuthPermission("auth.user.permission.list")
     @RequestMapping(value = "/permission/{id}", method = RequestMethod.GET)
     public Object permissionList(@PathVariable("id") Long id) {
         Map<String, Object> data = new HashMap<>();
@@ -211,46 +220,5 @@ public class UserController {
         List<Permission> list = userService.findPermissionByUserId(id);
         data.put("list", list);
         return JsonResponseUtil.ok(data);
-    }
-
-    // /**
-    // * 用户统计
-    // *
-    // * @return 返回结果
-    // */
-    // @ResponseBody
-    // @RequestMapping(value = "/count", method = RequestMethod.GET)
-    // public Object count(User user) {
-    // Map<String, Object> param = new HashMap<>();
-    // int count = userService.count(param);
-    // return JsonResponseUtil.ok(count);
-    // }
-    //
-    //
-    // @ResponseBody
-    // @RequestMapping(value = "/tes/{id}", method = RequestMethod.GET)
-    // public Object detailVO(@PathVariable("id") Long id) {
-    // try {
-    // if(id == null) {
-    // return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
-    // }
-    // List<UserVO> list = userService.findVOById(id);
-    // return JsonResponseUtil.ok(list);
-    // } catch (Exception e) {
-    // logger.error("用户列表, 异常", e);
-    // return JsonResponseUtil.fail(ErrorCode.SYS_ERROR);
-    // }
-    // }
-
-    /**
-     * 用户统计
-     *
-     * @return 返回结果
-     */
-    @ResponseBody
-    @RequestMapping(value = "/count", method = RequestMethod.GET)
-    public Object count() {
-        int count = 1/0;
-        return JsonResponseUtil.ok(count);
     }
 }

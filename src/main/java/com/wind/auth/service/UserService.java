@@ -69,7 +69,7 @@ public class UserService {
         if (StringUtils.isEmpty(username)) {
             return null;
         }
-        return userExDao.findByMobile(username);
+        return userExDao.findByUsername(username);
     }
 
 

@@ -48,7 +48,10 @@ public class RoleController {
             params.put("page", pageModel);
 
             List<Role> list = roleService.findPage(params);
+            int total = roleService.count(params);
+            pageModel.setTotal(total);
             data.put("list", list);
+            data.put("page", pageModel);
             return JsonResponseUtil.ok(data);
         } catch (Exception e) {
             logger.error("用户列表, 异常", e);
