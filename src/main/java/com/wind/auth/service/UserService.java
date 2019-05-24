@@ -171,7 +171,7 @@ public class UserService {
         User user = this.findById(userId);
         if (user == null) {
             logger.error("用户绑定角色更新, 用户不存在");
-            return ErrorCode.USER_NOT_EXISTS;
+            return ErrorCode.AUTH_USER_NOT_EXISTS;
         }
 
         List<Long> deleteRoleIds = new ArrayList<>();

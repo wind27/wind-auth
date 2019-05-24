@@ -88,7 +88,7 @@ public class MenuService {
         }
          Menu current = this.findByUrl(menu.getUrl());
         if (menu.getId() != null && current==null) {
-            return ErrorCode.MENU_URL_HAS_EXISTS;
+            return ErrorCode.AUTH_MENU_URL_EXISTS;
         }
         current.setStatus(1);
         current.setUrl(menu.getUrl());

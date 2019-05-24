@@ -148,7 +148,7 @@ public class RoleService {
         Role role = this.findById(roleId);
         if (role == null) {
             logger.error("角色权限更新, 角色不存在");
-            return ErrorCode.ROLE_NOT_EXISTS;
+            return ErrorCode.AUTH_ROLE_NOT_EXISTS;
         }
 
         List<Long> deletePermissionIds = new ArrayList<>();

@@ -73,7 +73,7 @@ public class RoleController {
         }
         Role role = roleService.findById(id);
         if (role == null) {
-            return JsonResponseUtil.fail(ErrorCode.ROLE_NOT_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_ROLE_NOT_EXISTS);
         }
         data.put("role", role);
         return JsonResponseUtil.ok(data);
@@ -92,7 +92,7 @@ public class RoleController {
         }
         boolean canUse = roleService.canUseRoleName(param.getName());
         if (!canUse) {
-            return JsonResponseUtil.fail(ErrorCode.ROLE_HAS_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_ROLE_EXISTS);
         }
         Role role = new Role();
         role.setName(param.getName());
@@ -191,7 +191,7 @@ public class RoleController {
         }
         Role role = roleService.findById(id);
         if (role == null) {
-            return JsonResponseUtil.fail(ErrorCode.USER_NOT_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_ROLE_NOT_EXISTS);
         }
         role.setStatus(1);
         role.setUpdateTime(new Date());
@@ -212,41 +212,11 @@ public class RoleController {
         }
         Role role = roleService.findById(id);
         if (role == null) {
-            return JsonResponseUtil.fail(ErrorCode.ROLE_NOT_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_ROLE_NOT_EXISTS);
         }
         role.setStatus(0);
         role.setUpdateTime(new Date());
         roleService.saveOrUpdate(role);
         return JsonResponseUtil.ok(role);
     }
-
-    // /**
-    // * 角色统计
-    // *
-    // * @return 返回结果
-    // */
-    // @ResponseBody
-    // @RequestMapping(value = "/count", method = RequestMethod.GET)
-    // public Object count(User user) {
-    //
-    // Map<String, Object> param = new HashMap<>();
-    //
-    // int count = roleService.count(param);
-    // return JsonResponseUtil.ok(count);
-    // }
-    //
-    //
-    //
-    // @ResponseBody
-    // @RequestMapping(value = "/test", method = RequestMethod.GET)
-    // public Object list() {
-    // try {
-    //
-    // List<RoleVO> list = roleService.findVOById(1L);
-    // return JsonResponseUtil.ok(list);
-    // } catch (Exception e) {
-    // logger.error("角色列表, 异常", e);
-    // return JsonResponseUtil.fail(ErrorCode.SYS_ERROR);
-    // }
-    // }
 }

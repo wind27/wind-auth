@@ -61,7 +61,7 @@ public class MenuController {
         }
         Menu menu = menuService.findById(id);
         if (menu == null) {
-            return JsonResponseUtil.fail(ErrorCode.USER_NOT_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_USER_NOT_EXISTS);
         }
         data.put("menu", menu);
         return JsonResponseUtil.ok(data);
@@ -118,7 +118,7 @@ public class MenuController {
         }
         Menu menu = menuService.findById(id);
         if (menu == null) {
-            return JsonResponseUtil.fail(ErrorCode.USER_NOT_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_MENU_NOT_EXISTS);
         }
         menu.setStatus(1);
         menu.setUpdateTime(new Date());
@@ -139,7 +139,7 @@ public class MenuController {
         }
         Menu menu = menuService.findById(id);
         if (menu == null) {
-            return JsonResponseUtil.fail(ErrorCode.USER_NOT_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_MENU_NOT_EXISTS);
         }
         menu.setStatus(0);
         menu.setUpdateTime(new Date());

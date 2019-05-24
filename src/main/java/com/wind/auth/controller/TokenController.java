@@ -52,7 +52,7 @@ public class TokenController {
             }
             User user = userService.findByUsername(username);
             if (user == null) {
-                return JsonResponseUtil.fail(ErrorCode.USER_NOT_EXISTS);
+                return JsonResponseUtil.fail(ErrorCode.AUTH_USER_NOT_EXISTS);
             }
             // 获取userToken
             UserToken userToken = userTokenService.getLastestByUsername(username);

@@ -71,7 +71,7 @@ public class UserController {
         }
         User user = userService.findById(id);
         if (user == null) {
-            return JsonResponseUtil.fail(ErrorCode.USER_NOT_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_USER_NOT_EXISTS);
         }
         data.put("user", user);
         return JsonResponseUtil.ok(data);
@@ -91,7 +91,7 @@ public class UserController {
         }
         User user = userService.findByMobile(param.getMobile());
         if (user != null) {
-            return JsonResponseUtil.fail(ErrorCode.USER_MOBILE_HAS_REGIST);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_USER_MOBILE_HAS_REGIST);
         }
         user = new User();
         user.setMobile(param.getMobile());
@@ -140,7 +140,7 @@ public class UserController {
         }
         User user = userService.findById(id);
         if (user == null) {
-            return JsonResponseUtil.fail(ErrorCode.USER_NOT_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_USER_NOT_EXISTS);
         }
         user.setStatus(1);
         user.setUpdateTime(new Date());
@@ -162,7 +162,7 @@ public class UserController {
         }
         User user = userService.findById(id);
         if (user == null) {
-            return JsonResponseUtil.fail(ErrorCode.USER_NOT_EXISTS);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_USER_NOT_EXISTS);
         }
         user.setStatus(0);
         user.setUpdateTime(new Date());

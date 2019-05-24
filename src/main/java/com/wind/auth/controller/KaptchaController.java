@@ -63,7 +63,7 @@ public class KaptchaController {
         }
         if (StringUtils.isBlank(sessionId)) {
             logger.error("图片验证码校验, sessionId 不存在, kaptcha={}", kaptcha);
-            return JsonResponseUtil.fail(ErrorCode.MISTAKE_STEP);
+            return JsonResponseUtil.fail(ErrorCode.AUTH_USER_MISTAKE_STEP);
         }
         ErrorCode errorCode = kaptchaService.verify(sessionId, kaptcha);
         if (!ErrorCode.SUCCESS.equals(errorCode)) {
