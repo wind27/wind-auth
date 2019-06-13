@@ -1,6 +1,7 @@
 package com.wind.auth.controller;
 
 import com.wind.auth.model.Permission;
+import com.wind.auth.model.PermissionVO;
 import com.wind.auth.model.User;
 import com.wind.auth.service.PermissionService;
 import com.wind.auth.service.UserService;
@@ -25,6 +26,9 @@ public class PermissionController {
     private final static Logger logger = LoggerFactory.getLogger(PermissionController.class);
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private PermissionService permissionService;
 
     /**
@@ -44,7 +48,6 @@ public class PermissionController {
 
             List<Permission> list = permissionService.findPage(params);
             int total = permissionService.count(params);
-
             pageModel.setTotal(total);
             data.put("list", list);
             data.put("page", pageModel);
@@ -172,5 +175,17 @@ public class PermissionController {
         permission.setUpdateTime(new Date());
         permissionService.update(permission);
         return JsonResponseUtil.ok();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/permission/{userId}", method = RequestMethod.GET)
+    public Object permissionList(@PathVariable("userId") Long userId) {
+        List<Permission> hasPermissionList = userService.findPermissionByUserId(1L);
+        List<Permission> allPermission = permissionService.findPage(null);
+        PermissionVO root = permissionService.sort(allPermission, hasPermissionList);
+        if (root == null) {
+            return JsonResponseUtil.fail(ErrorCode.AUTH_PERMISSION_NOT_EXISTS);
+        }
+        return JsonResponseUtil.ok(root);
     }
 }

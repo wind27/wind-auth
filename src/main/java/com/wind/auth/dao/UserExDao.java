@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * PermissionExDao
+ * UserExDao
  *
  * @author qianchun
  * @date 2019/3/12
@@ -25,6 +25,7 @@ public interface UserExDao extends UserDao {
      * @param mobile 手机号
      * @return 返回结果
      */
+    @ResultMap(value = "userResult")
     @Select(SELECT_SQL + " WHERE mobile = #{mobile} limit 0, 1")
     User findByMobile(String mobile);
 
@@ -33,8 +34,18 @@ public interface UserExDao extends UserDao {
      * @param username 用户名
      * @return 返回结果
      */
+    @ResultMap(value = "userResult")
     @Select(SELECT_SQL + " WHERE username = #{username} limit 0, 1")
     User findByUsername(String username);
+
+    /**
+     * 根据用户名获取用户信息
+     * @param username 用户名
+     * @return 返回结果
+     */
+    @ResultMap(value = "userResult")
+    @Select(SELECT_SQL + " WHERE username = #{username} limit 0, 1")
+    UserVO findVOByUsername(String username);
 
     /**
      * 分页查询

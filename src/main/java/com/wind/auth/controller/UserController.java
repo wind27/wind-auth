@@ -1,9 +1,7 @@
 package com.wind.auth.controller;
 
-import com.wind.auth.model.Permission;
-import com.wind.auth.model.RoleVO;
-import com.wind.auth.model.User;
-import com.wind.auth.model.UserVO;
+import com.wind.auth.model.*;
+import com.wind.auth.service.PermissionService;
 import com.wind.auth.service.UserService;
 import com.wind.common.ErrorCode;
 import com.wind.common.Page;
@@ -203,22 +201,37 @@ public class UserController {
         }
     }
 
-    /**
-     * 获取用户权限列表
-     * 
-     * @param id 用户id
-     * @return 返回结果
-     */
+//    /**
+//     * 获取用户权限列表
+//     *
+//     * @param id 用户id
+//     * @return 返回结果
+//     */
+//    @ResponseBody
+////    @AuthPermission("auth.user.permission.list")
+//    @RequestMapping(value = "/permission/{id}", method = RequestMethod.GET)
+//    public Object permissionList(@PathVariable("id") Long id) {
+//        Map<String, Object> data = new HashMap<>();
+//        if (id == null) {
+//            return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
+//        }
+//        List<Permission> list = userService.findPermissionByUserId(id);
+//        data.put("list", list);
+//        return JsonResponseUtil.ok(data);
+//    }
+
     @ResponseBody
-//    @AuthPermission("auth.user.permission.list")
-    @RequestMapping(value = "/permission/{id}", method = RequestMethod.GET)
-    public Object permissionList(@PathVariable("id") Long id) {
-        Map<String, Object> data = new HashMap<>();
-        if (id == null) {
-            return JsonResponseUtil.fail(ErrorCode.PARAM_ERROR);
+    @RequestMapping(value = "/permission", method = RequestMethod.GET)
+    public Object permissionList(@RequestParam("userId") Long userId) {
+        List<Permission> hasPermissionList = userService.findPermissionByUserId(userId);
+        List<Permission> allPermission = permissionService.findPage(null);
+        PermissionVO root = permissionService.sort(allPermission, hasPermissionList);
+        if (root == null) {
+            return JsonResponseUtil.fail(ErrorCode.AUTH_PERMISSION_NOT_EXISTS);
         }
-        List<Permission> list = userService.findPermissionByUserId(id);
-        data.put("list", list);
-        return JsonResponseUtil.ok(data);
+        return JsonResponseUtil.ok(root);
     }
+
+    @Autowired
+    private PermissionService permissionService;
 }

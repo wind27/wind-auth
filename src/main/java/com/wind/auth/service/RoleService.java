@@ -55,6 +55,18 @@ public class RoleService {
     }
 
     /**
+     * 根据用户id获取角色列表
+     * @param id 用户id
+     * @return 返回结果
+     */
+    public List<Role> findRoleByUserId(Long id) {
+        if (id == 0) {
+            return null;
+        }
+        return roleExDao.findRoleByUserId(id);
+    }
+
+    /**
      * 角色名是否可用
      * 
      * @param name 角色名

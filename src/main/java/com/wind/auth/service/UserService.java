@@ -72,6 +72,12 @@ public class UserService {
         return userExDao.findByUsername(username);
     }
 
+    public User findVOByUsername(String username) {
+        if (StringUtils.isEmpty(username)) {
+            return null;
+        }
+        return userExDao.findByUsername(username);
+    }
 
     /**
      * 新增或修改
@@ -126,45 +132,59 @@ public class UserService {
         return userExDao.findPage(params);
     }
 
-
     /**
      * 根据 userId 获取权限列表
+     * 
      * @param userId 用户id
      * @return 返回结果
      */
     public List<Permission> findPermissionByUserId(Long userId) {
-        if(userId == null) {
+        if (userId == null) {
             return null;
         }
         List<Long> roleIdList = roleExDao.findRoleIdsByUserId(userId);
-        if(CollectionUtils.isNotEmpty(roleIdList)) {
+        if (CollectionUtils.isNotEmpty(roleIdList)) {
             return permissionExDao.getByRoleIds(roleIdList);
         }
-        return  null;
+        return null;
     }
+
+    /**
+     * 根据 userId 获取角色列表
+     * 
+     * @param userId 用户id
+     * @return 返回结果
+     */
+    public List<Role> findRoleByUserId(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+        return roleExDao.findRoleByUserId(userId);
+    }
+
     /**
      * 根据用户id获取用户信息,角色信息,权限信息
+     * 
      * @param id 用户id
      * @return 返回结果
      */
     public List<UserVO> findVOById(Long id) {
-        if(id == null) {
+        if (id == null) {
             return null;
         }
         return userExDao.findVOById(id);
     }
 
-
-
     /**
      * 更新用户绑定角色
+     * 
      * @param userId 用户id
      * @param roleIds 权限列表
      * @return 返回结果
      */
-//    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    // @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public ErrorCode updateRolesById(Long userId, List<Long> roleIds) {
-        if(userId == null) {
+        if (userId == null) {
             return ErrorCode.PARAM_ERROR;
         }
 
@@ -176,23 +196,23 @@ public class UserService {
 
         List<Long> deleteRoleIds = new ArrayList<>();
         List<Long> currentRoleIdList = roleExDao.findRoleIdsByUserId(userId);
-        //删除角色
-        if(CollectionUtils.isNotEmpty(currentRoleIdList)) {
+        // 删除角色
+        if (CollectionUtils.isNotEmpty(currentRoleIdList)) {
             currentRoleIdList.forEach(id -> {
-                if(!roleIds.contains(id)) {
+                if (!roleIds.contains(id)) {
                     deleteRoleIds.add(id);
                 }
             });
 
-            if(CollectionUtils.isNotEmpty(deleteRoleIds)) {
+            if (CollectionUtils.isNotEmpty(deleteRoleIds)) {
                 linkUserRoleExDao.deleteByRoleIds(deleteRoleIds);
             }
         }
         List<LinkUserRole> addLinkUserRoleList = new ArrayList<>();
-        //新增角色
-        if(CollectionUtils.isNotEmpty(roleIds)) {
+        // 新增角色
+        if (CollectionUtils.isNotEmpty(roleIds)) {
             roleIds.forEach(roleId -> {
-                if(!currentRoleIdList.contains(roleId)) {
+                if (!currentRoleIdList.contains(roleId)) {
                     Date now = new Date();
                     LinkUserRole userRole = new LinkUserRole();
                     userRole.setRoleId(roleId);
@@ -202,7 +222,7 @@ public class UserService {
                     addLinkUserRoleList.add(userRole);
                 }
             });
-            if(CollectionUtils.isNotEmpty(addLinkUserRoleList)) {
+            if (CollectionUtils.isNotEmpty(addLinkUserRoleList)) {
                 linkUserRoleExDao.batchSave(addLinkUserRoleList);
             }
         }

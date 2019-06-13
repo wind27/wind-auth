@@ -46,7 +46,7 @@ public interface PermissionExDao extends PermissionDao {
      * @param params 参数
      * @return 返回结果
      */
-    @SelectProvider(type = UserDao.UserProvider.class, method = "findPage")
+    @SelectProvider(type = PermissionProvider.class, method = "findPage")
     @ResultMap(value = "permissionResult")
     List<Permission> findPage(Map<String, Object> params);
 
