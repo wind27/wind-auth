@@ -1,4 +1,4 @@
-FROM centos-jdk-maven:7.8.3
+FROM centos-jdk-maven:master-525ac4d
 
 MAINTAINER qianchun, qianchun27@hotmail.com
 
